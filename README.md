@@ -12,7 +12,11 @@ Designed to run with local models on a Pi 5!
 - Markdown rendering & streaming
 
 How to run: 
-0. Ensure llama.cpp is installed with model `unsloth/Qwen3.5-0.8B-GGUF:UD-Q4_K_XL` (this can be changed in the code)
+### Prerequesites
+Ensure llama.cpp (`llama-server`) is installed in PATH
+with model `unsloth/Qwen3.5-0.8B-GGUF:UD-Q4_K_XL` (this can be changed in the code)
+
+### Steps
 1. Install `uv`
 2. Download the repo: `git clone https://github.com/duckida/nanoloop && cd nanoloop`
 3. Install packages `uv sync`
