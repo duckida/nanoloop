@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-linux:
-    name: Build on Linux
+    name: Build on Linux (x86_64)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +21,7 @@ jobs:
       - name: Build
         run: |
           uv run --with pyinstaller pyinstaller --onefile \
-            --name nanoloop-linux \
+            --name nanoloop-linux-x86_64 \
             --hidden-import openai \
             --hidden-import ddgs \
             --hidden-import rich \
@@ -29,11 +29,35 @@ jobs:
             main.py
       - uses: actions/upload-artifact@v4
         with:
-          name: nanoloop-linux
-          path: dist/nanoloop-linux
+          name: nanoloop-linux-x86_64
+          path: dist/nanoloop-linux-x86_64
+
+  build-linux-arm64:
+    name: Build on Linux (arm64)
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: uv sync
+      - name: Build
+        run: |
+          uv run --with pyinstaller pyinstaller --onefile \
+            --name nanoloop-linux-arm64 \
+            --hidden-import openai \
+            --hidden-import ddgs \
+            --hidden-import rich \
+            --hidden-import requests \
+            main.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nanoloop-linux-arm64
+          path: dist/nanoloop-linux-arm64
 
   build-windows:
-    name: Build on Windows
+    name: Build on Windows (x86_64)
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -82,7 +106,7 @@ jobs:
 
   release:
     name: Create Release
-    needs: [build-linux, build-windows, build-macos]
+    needs: [build-linux, build-linux-arm64, build-windows, build-macos]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
@@ -103,14 +127,16 @@ jobs:
             Automated build from commit ${{ github.sha }}
 
             Download the binary for your platform:
-            - 🐧 **Linux x86_64**: `nanoloop-linux`
+            - 🐧 **Linux x86_64**: `nanoloop-linux-x86_64`
+            - 🐧 **Linux arm64** (Pi 4/5, etc.): `nanoloop-linux-arm64`
             - 🪟 **Windows x86_64**: `nanoloop-windows.exe`
             - 🍎 **macOS arm64** (Apple Silicon M1/M2/M3): `nanoloop-macos`
 
             > Requires `llama-server` (from llama.cpp) to be installed and on your PATH.
             > Uses model `unsloth/Qwen3.5-0.8B-GGUF:UD-Q4_K_XL`
           files: |
-            dist/nanoloop-linux/nanoloop-linux
+            dist/nanoloop-linux-x86_64/nanoloop-linux-x86_64
+            dist/nanoloop-linux-arm64/nanoloop-linux-arm64
             dist/nanoloop-windows/nanoloop-windows.exe
             dist/nanoloop-macos/nanoloop-macos
           draft: false
