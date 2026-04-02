@@ -4,6 +4,8 @@ Designed to run with local models on a Pi 5!
 
 <img width="661" height="392" alt="Screenshot 2026-04-01 at 4 32 38 PM" src="https://github.com/user-attachments/assets/5259954f-f93c-4256-9665-7e16bd200567" />
 
+[video demo](https://docs.google.com/videos/d/1fNEpXDZw1tccgVNDhWfvO3ijx5BdTW03cPFWF_T1IEQ/edit?usp=sharing)
+
 
 ## Features
 - Connects to llama.cpp
