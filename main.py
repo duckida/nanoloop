@@ -29,7 +29,7 @@ def start_servers():
         "--host", "0.0.0.0", "--port", "8080", "-c", str(BIG_MODEL_TOTAL_CONTEXT), "--reasoning-budget", "0", "--parallel", "1", "--webui-mcp-proxy", "--threads", "2", "--flash-attn", "on", "--cache-type-k", "q8_0", "--cache-prompt", "--ubatch-size", "512", "-ctv", "q8_0", "--threads-batch", "4", "--no-mmproj"
     ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     small_model_process = subprocess.Popen([
-        "/home/pi/llama.cpp/build/bin/llama-server", 
+        "llama-server", 
         "-hf", SMALL_MODEL, 
         "--host", "0.0.0.0", "--port", "8081", "-c", "6000", "--reasoning-budget", "0", "--parallel", "1", "--webui-mcp-proxy", "--threads", "2", "--flash-attn", "on", "--cache-type-k", "q8_0", "--cache-prompt", "--ubatch-size", "512", "-ctv", "q8_0", "--threads-batch", "4", "--no-mmproj"
     ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
