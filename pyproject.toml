@@ -1,0 +1,12 @@
+[project]
+name = "nanoloop"
+version = "0.1.0"
+description = "Little AI agent loop for local models"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "ddgs>=9.12.0",
+    "openai>=2.30.0",
+    "requests>=2.33.1",
+    "rich>=14.3.3",
+]
