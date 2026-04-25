@@ -1,6 +1,6 @@
 # nanoloop
 Small Python-based agent loop for nano local models!
-Designed to run with local models on a Pi 5!
+Designed to run with local models but works with anything.
 
 <img width="661" height="392" alt="Screenshot 2026-04-01 at 4 32 38 PM" src="https://github.com/user-attachments/assets/5259954f-f93c-4256-9665-7e16bd200567" />
 
@@ -8,20 +8,29 @@ Designed to run with local models on a Pi 5!
 
 
 ## Features
-- Connects to llama.cpp
-- Big and small model settings (small model used to summarize web searches)
-- Web search and shell command tools
-- Markdown rendering & streaming
+- Connects to OpenAI compatible servers (llama.cpp, Ollama, LM Studio, Qwen, Gemini etc.)
+- Big and small model settings (small model used to summarize web searches and for multi step bash commands)
+- Web search, todo and shell command tools
+- Markdown rendering
 
 How to run: 
-### Prerequesites
-Ensure llama.cpp (`llama-server`) is installed in PATH
-with model `unsloth/Qwen3.5-0.8B-GGUF:UD-Q4_K_XL` (this can be changed in the code)
 
 ### Steps
 1. Install `uv`
 2. Download the repo: `git clone https://github.com/duckida/nanoloop && cd nanoloop`
 3. Install packages `uv sync`
-4. Run with `uv run main.py`
+4. Run with correct arguments
+**Local models:** `uv run main.py -bb {big model base url} -sb {small model base url} -small {small model name} -big {big model name}`
+**Cloud models:**
+bash```
+uv run main.py \
+  -bb {big model base url} \
+  -sb {small model base url} \
+  -big {big model name} \
+  -small {small model name} \
+  -ba {big model API key} \
+  -sa {small model API key}```
 
-> Note: there is no warranty with nanoloop. It uses small LLMs and may delete files on your device. Use at your own risk.
+Like this you can mix and match LLMs from different providers, cloud and local. For example, the big model is a cloud model and the small model is local.
+
+> Note: there is no warranty with nanoloop. It uses LLMs and may delete files on your device. Use at your own risk.
