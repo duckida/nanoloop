@@ -127,15 +127,12 @@ jobs:
             Automated build from commit ${{ github.sha }}
 
             Download the binary for your platform:
-            - 🐧 **Linux x86_64**: `nanoloop-linux-x86_64`
-            - 🐧 **Linux arm64** (Pi 4/5, etc.): `nanoloop-linux-arm64`
-            - 🪟 **Windows x86_64**: `nanoloop-windows.exe`
-            - 🍎 **macOS arm64** (Apple Silicon M1/M2/M3): `nanoloop-macos`
+            - **Linux x86_64**: `nanoloop-linux-x86_64`
+            - **Linux arm64** (Pi 4/5, etc.): `nanoloop-linux-arm64`
+            - **Windows x86_64**: `nanoloop-windows.exe`
+            - **macOS arm64** (Apple Silicon M1/M2/M3): `nanoloop-macos`
             
             On Linux & macOS you may need to chmod +x the file before running it
-
-            > Requires `llama-server` (from llama.cpp) to be installed and on your PATH.
-            > Uses model `unsloth/Qwen3.5-0.8B-GGUF:UD-Q4_K_XL`
           files: |
             dist/nanoloop-linux-x86_64/nanoloop-linux-x86_64
             dist/nanoloop-linux-arm64/nanoloop-linux-arm64
