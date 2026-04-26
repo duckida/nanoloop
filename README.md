@@ -13,6 +13,8 @@ Designed to run with local models but works with anything.
 - Web search, todo, file edit and shell command tools
 - Markdown rendering
 
+[Here](https://gisthost.github.io/?2f876b475934a99a34912fa9701eb435) is an example of an app implemented by nanoloop!
+
 How to run: 
 
 ### Steps
