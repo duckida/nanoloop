@@ -175,13 +175,41 @@ tools = [
             "description": "View the todo list."
         }
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "edit_file",
+            "description": "Edit a file surgically by replacing a unique string with a new string. Fails safely if the original string is not found or appears more than once.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "absolute_path": {
+                        "type": "string",
+                        "description": "The absolute path to the file to edit."
+                    },
+                    "original_string": {
+                        "type": "string",
+                        "description": "The unique string in the file to replace."
+                    },
+                    "new_string": {
+                        "type": "string",
+                        "description": "The string to replace it with."
+                    }
+                },
+                "required": ["absolute_path", "original_string", "new_string"]
+            }
+        }
+    },
     
 ] 
 
-system_prompt = {"role": "system", "content": """You are nanoloop, a lightweight AI agent running on a local LLM.
+system_prompt = {"role": "system", "content": """
+You are nanoloop, a lightweight AI agent running on a local LLM.
 Act efficiently and correctly to complete the user's tasks.
+
 ALWAYS use the todo list for ANY multi-step tasks and specify what tools you will use in it.
-Use the `use_computer` tool for most shell tasks including indexing, making many edits etc. but not for single-command tasks.
+Use the `use_computer` tool for most shell tasks including indexing, but not for single-command tasks or file editing.
+
 Keep looping until the task is complete, then output the final response starting with <final>.
 For responses where you are thinking or planning, do not use this tag. In these responses, don't include greetings, messages or questions to the user - this is your INTERNAL reasoning chain.
 Every single response you send to the user must start with the token <final>.  """
@@ -205,7 +233,7 @@ def ask_big_model(user_message):
         )
         
         if response.usage:
-            tokens += response.usage.prompt_tokens
+            tokens += response.usage.prompt_tokens + response.usage.completion_tokens
         
         response_message = response.choices[0].message
         content = response_message.content
@@ -246,11 +274,16 @@ def ask_big_model(user_message):
                     "content": result,
                 })
             
-        else:
-            # If no tools and no <final>, it's just thinking. 
-            # We print it to see the "brain" working.
+        else:  
             if content:
                 print(f"💭 {truncate(content.strip())}")
+                main_messages.append({
+                    "role": "user",
+                    "content": "Continue working. If you have a final answer for the user, start your response with <final>."
+                })
+            else:
+                print("⚠️  Empty response - breaking loop.")
+                break
 
 
 # TOOL FUNCTIONS
@@ -267,6 +300,10 @@ def parse_tools(function_name, args):
         elif function_name == "use_computer":
             print(f"🖥️  Using computer: {truncate(args['task'])}")
             result = use_computer(args['task'])
+        
+        elif function_name == "edit_file":
+            print(f"📝 Editing file: {truncate(args['absolute_path'])}")
+            result = edit_file(args['absolute_path'], args['original_string'], args['new_string'])
         
         elif function_name == "add_todo":
             print(f"📝 Adding todo: {truncate(args['task'])}")
@@ -356,6 +393,35 @@ def use_computer(task):
     )
     return final.choices[0].message.content
 
+def edit_file(absolute_path, original_string, new_string):
+    try:
+        with open(absolute_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+    except FileNotFoundError:
+        print(f"File {absolute_path} does not exist.")
+        result = f"File {absolute_path} does not exist."
+        return result
+        
+    
+    occurrence_count = content.count(original_string)
+    if occurrence_count == 0:
+        result = f"Warning: '{original_string}' not found in {absolute_path}. No changes made."
+        return result
+    if occurrence_count > 1:
+        result = f"Expected exactly 1 occurrence of '{original_string}', but found {occurrence_count} in {absolute_path}. Aborting to prevent unintended changes."
+        return result
+    
+    new_content = content.replace(original_string, new_string)
+
+    # Write back to file
+    try:
+        with open(absolute_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+    except OSError as e:
+        return f"Error writing to {absolute_path}: {e}"
+
+    return "Edit successful"
+
 
 # todo list tools
 agent_todo = []
@@ -432,6 +498,7 @@ print(r"""
                                        | |    
                                        |_|
                                        """)
+print(f"• big model: {BIG_MODEL} • small model: {SMALL_MODEL}")
 
 while True:
     user_message = input(f"\nnanoloop ({tokens} tokens used)>")
