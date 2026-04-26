@@ -10,7 +10,7 @@ Designed to run with local models but works with anything.
 ## Features
 - Connects to OpenAI compatible servers (llama.cpp, Ollama, LM Studio, Qwen, Gemini etc.)
 - Big and small model settings (small model used to summarize web searches and for multi step bash commands)
-- Web search, todo and shell command tools
+- Web search, todo, file edit and shell command tools
 - Markdown rendering
 
 How to run: 
