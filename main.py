@@ -353,7 +353,7 @@ def web_search(question):
         messages=[{"role": "user", "content": f"Generate a short Google search query for the question {question}"}]
     )
     
-    search_results = DDGS().text(search_query.choices[0].message.content, max_results=3, backend='duckduckgo')
+    search_results = DDGS().text(search_query.choices[0].message.content, max_results=3)
     
     # Summarize the search results
     summary = small_model_client.chat.completions.create(
