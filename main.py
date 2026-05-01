@@ -266,6 +266,7 @@ def message_to_dict(msg):
 
 def save_chat_history(messages):
     history_path = base_path / "messages.json"
+    history_path.parent.mkdir(parents=True, exist_ok=True)  # ← add this
     with open(history_path, "w", encoding="utf-8") as f:
         json.dump(messages, f, indent=4)
 
