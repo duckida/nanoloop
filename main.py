@@ -266,7 +266,6 @@ def message_to_dict(msg):
 
 def save_chat_history(messages):
     history_path = base_path / "messages.json"
-    history_path.parent.mkdir(parents=True, exist_ok=True)  # ← add this
     with open(history_path, "w", encoding="utf-8") as f:
         json.dump(messages, f, indent=4)
 
@@ -491,66 +490,73 @@ print(r"""
 print(f"• big model: {big_agent.model} • small model: {small_agent.model}")
 
 while True:
-    user_message = input(f"\nnanoloop ({tokens} tokens used)>")
+    try:
+        user_message = input(f"\nnanoloop ({tokens} tokens used)>")
 
-    if not user_message.strip():
-        continue
+        if not user_message.strip():
+            continue
 
-    if user_message.startswith("/"):
-        parse_slash_command(user_message)
-        continue
+        if user_message.startswith("/"):
+            parse_slash_command(user_message)
+            continue
 
-    # ── Agent loop ────────────────────────────────────────────────────────────
-    main_messages.append({"role": "user", "content": user_message})
-    save_chat_history(main_messages)
-
-    while True:
-        response = big_agent.chat(main_messages)
-
-        if response.usage:
-            tokens += response.usage.prompt_tokens + response.usage.completion_tokens
-
-        response_message = response.choices[0].message
-        content = response_message.content
-        tool_calls = response_message.tool_calls
-
-        if content and content.strip().startswith("<final>"):
-            print("\n")
-            with Live(Markdown(""), console=console, refresh_per_second=15) as live:
-                display_text = content.replace("<final>", "", 1).strip()
-                for i in range(0, len(display_text), 8):
-                    live.update(Markdown(display_text[: i + 8]))
-                    sleep(0.005)
-            main_messages.append({"role": "assistant", "content": content})
-            save_chat_history(main_messages)
-            break
-
-        main_messages.append(message_to_dict(response_message))
+        # ── Agent loop ────────────────────────────────────────────────────────────
+        main_messages.append({"role": "user", "content": user_message})
         save_chat_history(main_messages)
 
-        if tool_calls:
-            for tool_call in tool_calls:
-                function_name = tool_call.function.name
-                fn_args = json.loads(tool_call.function.arguments)
-                result = parse_tools(function_name, fn_args)
+        while True:
+            response = big_agent.chat(main_messages)
+
+            if response.usage:
+                tokens += (
+                    response.usage.prompt_tokens + response.usage.completion_tokens
+                )
+
+            response_message = response.choices[0].message
+            content = response_message.content
+            tool_calls = response_message.tool_calls
+
+            if content and content.strip().startswith("<final>"):
+                print("\n")
+                with Live(Markdown(""), console=console, refresh_per_second=15) as live:
+                    display_text = content.replace("<final>", "", 1).strip()
+                    for i in range(0, len(display_text), 8):
+                        live.update(Markdown(display_text[: i + 8]))
+                        sleep(0.005)
+                main_messages.append({"role": "assistant", "content": content})
+                save_chat_history(main_messages)
+                break
+
+            main_messages.append(message_to_dict(response_message))
+            save_chat_history(main_messages)
+
+            if tool_calls:
+                for tool_call in tool_calls:
+                    function_name = tool_call.function.name
+                    fn_args = json.loads(tool_call.function.arguments)
+                    result = parse_tools(function_name, fn_args)
+                    main_messages.append(
+                        {
+                            "tool_call_id": tool_call.id,
+                            "role": "tool",
+                            "name": function_name,
+                            "content": result,
+                        }
+                    )
+                    save_chat_history(main_messages)
+            elif content:
+                print(f"💭 {truncate(content.strip())}")
                 main_messages.append(
                     {
-                        "tool_call_id": tool_call.id,
-                        "role": "tool",
-                        "name": function_name,
-                        "content": result,
+                        "role": "user",
+                        "content": "Continue working. If you have a final answer for the user, start your response with <final>.",
                     }
                 )
                 save_chat_history(main_messages)
-        elif content:
-            print(f"💭 {truncate(content.strip())}")
-            main_messages.append(
-                {
-                    "role": "user",
-                    "content": "Continue working. If you have a final answer for the user, start your response with <final>.",
-                }
-            )
-            save_chat_history(main_messages)
-        else:
-            print("⚠️  Empty response.")
-            break
+            else:
+                print("⚠️  Empty response.")
+                break
+
+    except Exception as e:
+        print(f"ERROR: {e}")
+        print(f"To resume, type /resume {session_id}")
