@@ -554,8 +554,14 @@ while True:
                 )
                 save_chat_history(main_messages)
             else:
-                print("⚠️  Empty response.")
-                break
+                print("⚠️  Empty response, asking model to continue...")
+                main_messages.append(
+                    {
+                        "role": "user",
+                        "content": "Your last response was empty. Please continue working or provide your final answer starting with <final>.",
+                    }
+                )
+                save_chat_history(main_messages)
 
     except Exception as e:
         print(f"ERROR: {e}")
