@@ -1,5 +1,5 @@
 from openai import OpenAI
-
+import openai
 
 class Agent:
     def __init__(self, base_url, api_key, model, tools=None):
