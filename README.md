@@ -15,7 +15,7 @@ Designed to run with local models but works with anything.
 
 [Here](https://gisthost.github.io/?2f876b475934a99a34912fa9701eb435) is an example of an app implemented by nanoloop!
 
-How to run: 
+## How to run: 
 
 ### Steps
 1. Install `uv`
@@ -34,5 +34,24 @@ uv run main.py \
   -sa {small model API key}```
 
 Like this you can mix and match LLMs from different providers, cloud and local. For example, the big model is a cloud model and the small model is local.
+
+## Example Commands
+
+**Hack Club AI:**
+```
+uv run main.py \
+  -bb https://ai.hackclub.com/proxy/v1 \
+  -sb https://ai.hackclub.com/proxy/v1 \
+  -big xiaomi/mimo-v2-omni \
+  -small qwen/qwen3-next-80b-a3b-instruct \
+  -ba sk-hc-v1-your-key \
+  -sa sk-hc-v1-your-key
+```
+
+**LM Studio:**
+```
+uv run main.py -bb http://127.0.0.1:1234/v1 -sb http://127.0.0.1:1234/v1 -small qwen3.6-35b-a3b -big qwen3.6-35b-a3b
+```
+
 
 > Note: there is no warranty with nanoloop. It uses LLMs and may delete files on your device. Use at your own risk.
