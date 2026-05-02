@@ -1,5 +1,8 @@
-from openai import OpenAI
+import time
+
 import openai
+from openai import OpenAI
+
 
 class Agent:
     def __init__(self, base_url, api_key, model, tools=None):
